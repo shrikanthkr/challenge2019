@@ -16,13 +16,10 @@ class DeliveryManager
   end
 
   def expected_output(theatre, input)
+    total_data = input.total_data.to_i
     output = Output.new(input.id)
     theatre.partners.each do |partner_id, partner|
-      partner.size_slabs.each do |slab|
-        total_data = input.total_data.to_i
-        next unless slab.range.include? total_data
-
-
+      partner.filtered_slabs(total_data).each do |slab|
         cost = (slab.cost_per_gb * input.total_data).to_i
         expected_value = [cost, slab.min_cost].max.to_i
         if output.cost.nil?
