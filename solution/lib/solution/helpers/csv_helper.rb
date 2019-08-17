@@ -67,7 +67,7 @@ class CsvHelper
   def self.write_output outputs
     CSV.open("myfile.csv", "w") do |csv|
       outputs.each do |output|
-        csv << [output.id, output.possibility, output.cost, output.partner_id]
+        csv << [output.id, output.possibility, output.cost || "", output.partner_id]
       end
     end
   end

@@ -10,40 +10,36 @@ class DeliveryManager
   def deliver(inputs)
     outputs = []
     inputs.each do |input|
-      min_slab_partner_hash = min_slab_partner_hash(theatres_map[input.theatre_id], input)
-      if min_slab_partner_hash[:min_cost].nil?
-        outputs << Output.new(input.id, false, '', '')
-      else
-        outputs << Output.new(input.id, true, min_slab_partner_hash[:min_cost], min_slab_partner_hash[:partner])
-      end
+      outputs << expected_output(theatres_map[input.theatre_id], input)
     end
     outputs
   end
 
-  def min_slab_partner_hash(theatre, input)
-    min_hash = {}
-
+  def expected_output(theatre, input)
+    output = Output.new(input.id)
     theatre.partners.each do |partner_id, partner|
       partner.size_slabs.each do |slab|
         total_data = input.total_data.to_i
-        next unless (slab.range.include? total_data) && (capacities_hash[partner_id].to_i >= total_data)
+        next unless slab.range.include? total_data
 
 
-        cost = slab.cost_per_gb * input.total_data
-        expected_value = [cost, slab.min_cost].max
-        if min_hash[:min_cost].nil?
-          min_hash[:min_cost] = expected_value
-          min_hash[:partner] = partner_id
+        cost = (slab.cost_per_gb * input.total_data).to_i
+        expected_value = [cost, slab.min_cost].max.to_i
+        if output.cost.nil?
+          output.cost = expected_value
+          output.partner_id = partner_id
+          output.possibility = true
         else
 
-          if expected_value < min_hash[:min_cost]
-            min_hash[:min_cost] = expected_value
-            min_hash[:partner] = partner_id
+          if expected_value < output.cost
+            output.cost = expected_value
+            output.partner_id = partner_id
+            output.possibility = true
           end
         end
       end
     end
-    min_hash
+    output
   end
 
 end
