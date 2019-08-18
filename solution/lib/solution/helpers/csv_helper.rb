@@ -21,10 +21,11 @@ class CsvHelper
       next if i.zero?
 
       current_row = current_partner_file_hash(row)
-      theatre = theatre_map[current_row[:theatre_id]] || Theatre.new
-      partner = theatre.partners[current_row[:partner_id]] || Partner.new
+      theatre = theatre_map[current_row[:theatre_id]] || Theatre.new(current_row[:theatre_id])
+      partner = theatre.partners[current_row[:partner_id]] || Partner.new(current_row[:partner_id])
       size_slab = SizeSlab.new current_row[:size_slab], current_row[:min_cost],
                                current_row[:cost_per_gb]
+      partner.id = current_row[:partner_id]
       partner.size_slabs << size_slab
       theatre.partners[current_row[:partner_id]] = partner
       theatre_map[current_row[:theatre_id]] = theatre
@@ -67,7 +68,7 @@ class CsvHelper
   def self.write_output outputs
     CSV.open("myfile.csv", "w") do |csv|
       outputs.each do |output|
-        csv << [output.id, output.possibility, output.cost, output.partner_id]
+        csv << [output.id, output.possibility, output.partner_id, output.cost || ""]
       end
     end
   end
