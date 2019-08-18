@@ -69,11 +69,16 @@ class DeliveryManager
         end
       end
       suitable_partner = find_suitable_partner(filtered_outputs.compact(), total_output_cost)
-
       replace_index = suitable_partner[:original_index]
       new_output = expected_outputs[replace_index]
-      new_output.partner_id = suitable_partner[:partner].id
-      new_output.cost = suitable_partner[:output_cost]
+      if suitable_partner[:partner].nil?
+        new_output.partner_id = ""
+        new_output.possibility = false
+        new_output.cost = ""
+      else
+        new_output.partner_id = suitable_partner[:partner].id
+        new_output.cost = suitable_partner[:output_cost]
+      end
 
     end
   end
@@ -85,6 +90,11 @@ class DeliveryManager
     next_min = {}
     original_outputs.each_with_index do |output_hash, index|
       output = output_hash[:output]
+      if output.sorted_partner_array.empty?
+        next_min[:partner] = nil
+        next_min[:original_index] = output_hash[:index]
+        return next_min
+      end
       partner_hash = output.sorted_partner_array[0]
       expected_cost = partner_hash[:cost] - output.cost + initial_cost
       if next_min[:cost].nil?
