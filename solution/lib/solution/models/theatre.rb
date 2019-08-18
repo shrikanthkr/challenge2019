@@ -1,12 +1,13 @@
 class Theatre
-  attr_accessor :partners
+  attr_accessor :partners, :id
 
-  def initialize
+  def initialize(id)
+    @id = id
     @partners = {}
   end
 
   def to_json(*options)
-    { partners: @partners }
+    {partners: @partners}
   end
 
 end

@@ -11,4 +11,3 @@ require "solution"
 # Pry.start
 
 require "irb"
-IRB.start(__FILE__)

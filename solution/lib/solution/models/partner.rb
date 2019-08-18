@@ -1,9 +1,10 @@
 
 
 class Partner
-  attr_accessor :size_slabs
+  attr_accessor :id, :size_slabs
 
-  def initialize
+  def initialize(id)
+    @id = id
     @size_slabs = []
   end
 
